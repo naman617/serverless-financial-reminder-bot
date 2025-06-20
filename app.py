@@ -1,9 +1,11 @@
 import json
 import os
 import boto3
-from datetime import datetime, timedelta
+import requests
 import gspread
+from datetime import datetime, timedelta
 from google.oauth2.service_account import Credentials
+
 
 # --- AWS Clients and Constants ---
 # Initialize AWS clients once outside the handler for performance
@@ -39,38 +41,53 @@ def get_gspread_client():
     print("Authorizing with gspread...")
     return gspread.authorize(credentials)
 
-# --- Notification Helper Functions (Placeholders) ---
+# --- Replace the old send_telegram_alert function with this one ---
 def send_telegram_alert(message):
     """
-    Sends a formatted message to a Telegram chat.
-    (This is a placeholder - you will replace this with a real API call later)
+    Sends a formatted message to a Telegram chat using the requests library.
     """
-    print(f"TELEGRAM MOCK: Would send message: \n{message}")
-    # Example using requests library (would need to be packaged in your Lambda)
-    # import requests
-    # url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    # payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
-    # requests.post(url, json=payload)
-    pass
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("Telegram environment variables not set. Skipping alert.")
+        return
 
+    print(f"Sending Telegram alert...")
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown" # Allows for bold, italics, etc. if you want later
+    }
+    
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()  # This will raise an error for bad responses (4xx or 5xx)
+        print("Telegram alert sent successfully.")
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending Telegram alert: {e}")
+
+# --- Replace the old send_email_alert function with this one ---
 def send_email_alert(subject, body):
     """
     Sends an email using Amazon SES.
-    (This is a placeholder - you will replace this with a real API call later)
     """
-    print(f"EMAIL MOCK: Would send email with subject: '{subject}'")
-    # try:
-    #     ses_client.send_email(
-    #         Source=FROM_EMAIL,
-    #         Destination={'ToAddresses': [TO_EMAIL]},
-    #         Message={
-    #             'Subject': {'Data': subject},
-    #             'Body': {'Text': {'Data': body}}
-    #         }
-    #     )
-    # except Exception as e:
-    #     print(f"Error sending email: {e}")
-    pass
+    if not FROM_EMAIL or not TO_EMAIL:
+        print("Email environment variables not set. Skipping alert.")
+        return
+        
+    print(f"Sending email with subject: '{subject}'")
+    try:
+        ses_client.send_email(
+            Source=FROM_EMAIL,
+            Destination={'ToAddresses': [TO_EMAIL]},
+            Message={
+                'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+                'Body': {'Text': {'Data': body, 'Charset': 'UTF-8'}}
+            }
+        )
+        print("Email alert sent successfully.")
+    except Exception as e:
+        # This will catch errors, e.g., if the recipient isn't verified and you're in the sandbox
+        print(f"Error sending email: {e}")
 
 # --- Main Lambda Handler ---
 def daily_reminder_handler(event, context):
