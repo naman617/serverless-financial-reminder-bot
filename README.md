@@ -42,6 +42,7 @@ Google Sheets API, Google Drive API, Google Apps Script
 Telegram Bot API
 
 Architecture Diagram
+
 The system is orchestrated by a daily scheduled event that triggers the main Lambda function. This function then coordinates with all other services to read, process, and send notifications.
 
 ```mermaid
