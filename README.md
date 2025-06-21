@@ -40,6 +40,7 @@ Key Services:
 AWS Lambda, Amazon EventBridge, Amazon DynamoDB, AWS Systems Manager Parameter Store, Amazon SES, Amazon S3, Amazon API Gateway
 Google Sheets API, Google Drive API, Google Apps Script
 Telegram Bot API
+
 Architecture Diagram
 The system is orchestrated by a daily scheduled event that triggers the main Lambda function. This function then coordinates with all other services to read, process, and send notifications.
 
