@@ -69,6 +69,7 @@ graph TD
 ```
 
 Future Scope & Alternatives
+
 The Self-Hosted, Privacy-First Model
 For users with maximum privacy concerns, the cloud-based nature of this project is not a requirement. The entire architecture could be replicated locally with minimal changes:
 
@@ -79,6 +80,7 @@ Notifications: The only internet-facing components would be the outbound notific
 This self-hosted model demonstrates the flexibility of the core logic and provides a path for users who wish for their data to never leave their home network.
 
 Project Setup & Deployment
+
 To replicate this project, you would need to configure three main areas:
 
 1. Google Cloud & Spreadsheet Setup
